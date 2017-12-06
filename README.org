@@ -1,0 +1,133 @@
+#+TITLE: Development with Docker Engine and Compose
+#+AUTHOR: Zak B. Elep
+#+EMAIL: zakame@zakame.net
+#+OPTIONS: toc:nil num:nil email:t
+#+REVEAL_THEME: night
+#+REVEAL_EXTRA_CSS: extra.css
+#+REVEAL_PLUGINS: (notes)
+
+https://github.com/zakame/dscl-devday-docker-compose
+
+* About Me
+
+  - @zakame on GitHub, Twitter, FB
+  - Goon from the Philippine Linux Users Group
+  - Co-organizer, Docker Manila Meetup group
+  - Hacks on Perl, Docker, Emacs
+
+  #+BEGIN_NOTES
+  This is written using Emacs OrgMode, publishing using Reveal.js.
+  #+END_NOTES
+
+* What's this for?
+
+  - Short intro on Docker
+  - Assumes a developer audience (this is DSCL DevDay after all...)
+  - Assumes some familiarity with server infra (for the ops people at the back...)
+
+  #+BEGIN_NOTES
+  This is adapted from my old [[https://zakame.github.io/docker-eb-demo/README.html][Docker on AWS]] talk, for DSCL DevDay,
+  updated so it focuses more on Docker Engine and Docker Compose.
+  #+END_NOTES  
+
+* Why Docker?
+
+  - Distribution
+  - Maintenance
+  - Development
+
+** The Problem
+
+   "How can I share my work with others while making it easy for them to
+   change it?"
+
+*** Distribution
+
+    - Software systems as containers
+    - (Mostly) standalone systems (especially for exotic setups)
+    - (Mostly) less chance of incompatibilities/inconsistencies
+
+    #+BEGIN_NOTES
+    Thinking of containers as "boxes" does wonders here, because it lets
+    your treat the system as something you can "hold" (that is, know what
+    is inside the box, as well as what's outside) and something that you
+    can "move/share" (as boxes tend to be.)
+    #+END_NOTES
+
+*** Maintenance
+
+    - Growing from "pet to cattle" setups
+    - Reducing moving targets (e.g. external dependencies and/or hybrid
+      OS requirements)
+    - Redundancy (e.g. blue-green deployments)
+
+    #+BEGIN_NOTES
+    Sysadmins especially love stability, and having a concept of "stuff
+    inside a box" strengthens the idea of containers being (near)
+    immutable systems.
+    #+END_NOTES
+
+*** Development
+
+    - Builds up on distribution and maintenance merits
+    - Correlate code history with system history (e.g. git vs docker commits)
+    - Leverage other solutions (e.g. configuration
+      management/deployment/orchestration tools)
+
+    #+BEGIN_NOTES
+    Developers love to tinker, and knowing that they can treat both boxes
+    and the stuff inside them as parts they can know and change, while
+    building up on the fact that they can share those boxes and maintain
+    them, gives an empowering feeling.
+    #+END_NOTES
+
+* Containers
+
+  Operating-system-level virtualization
+
+  https://res.cloudinary.com/startup-grind/image/upload/c_fill%2Cf_auto%2Cg_center%2Ch_350%2Cq_auto%3Agood%2Cw_350%2Fv1%2Fsoftlayer0%2F80135C1%2Fmedia%2Fv1%2FAUTH_d0619b05-07fc-49f0-8249-da585ea45ce5%2Fdocker%2Fevents%2Fcommunity_JJgCnE6.png
+
+** Containers vs Virtual Machines
+
+   - Operating-system-level vs hardware-abstraction-level
+   - Containers can run under VMs (and often do,) but not usually the
+     other way around
+   - Containers depend on OS features (Linux)
+
+** Other Container implementations/tools
+
+   - Linux Containers (LXC)
+   - plain Unix chroot
+   - FreeBSD jails
+   - Solaris Zones
+
+* Docker Plaform
+
+  https://image.slidesharecdn.com/dockercon-eu-2017-recap-171025193523/95/dockercon-eu-2017-recap-24-638.jpg
+
+** Docker Engine
+
+   - The "heart" of the Docker ecosystem
+   - Used to be just a big front-end for the Linux containers
+   - Now uses libcontainer to front-end for implementations
+
+*** Demo: A simple CLI app container
+
+** Docker Compose
+
+   - Arrange *containers* into *services*
+   - Express software systems in terms of *services*, *networks*, and
+     *volumes*
+   - Adapt systems to different environments (dev vs prod) via
+     *composition* of configuration
+
+*** Demo: A webapp with several services
+
+* More Information
+
+  - [[https://www.slideshare.net/Docker/docker-for-devs-john-zaccone-ibm][Docker for Devs by John Zacchone, IBM]]
+  - [[https://www.slideshare.net/Docker/docker-for-ops-scott-coulton-puppet][Docker for Ops by Scott Coulton, Puppet]]
+  - [[https://www.slideshare.net/chanezon/dockercon-eu-2017-recap][DockerCon EU 2017 Recap]]
+  - [[http://training.play-with-docker.com/][Play With Docker Classroom]]
+
+* Finis
