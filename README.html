@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Development with Docker Engine and Compose</title>
+<meta name="author" content="(Zak B. Elep)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/night.css" id="theme"/>
+
+<link rel="stylesheet" href="extra.css"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'https://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h1 class="title">Development with Docker Engine and Compose</h1><h2 class="author">Zak B. Elep</h2><h2 class="email"><a href="mailto:zakame@zakame.net">zakame@zakame.net</a></h2><p class="date">Created: 2017-12-05 Tue 21:06</p>
+</section>
+<p>
+<a href="https://github.com/zakame/dscl-devday-docker-compose">https://github.com/zakame/dscl-devday-docker-compose</a>
+</p>
+
+<section>
+<section id="slide-org54ba666">
+<h2 id="org54ba666">About Me</h2>
+<ul>
+<li>@zakame on GitHub, Twitter, FB</li>
+<li>Goon from the Philippine Linux Users Group</li>
+<li>Co-organizer, Docker Manila Meetup group</li>
+<li>Hacks on Perl, Docker, Emacs</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+This is written using Emacs OrgMode, publishing using Reveal.js.
+</p>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org366a466">
+<h2 id="org366a466">What's this for?</h2>
+<ul>
+<li>Short intro on Docker</li>
+<li>Assumes a developer audience (this is DSCL DevDay after all&#x2026;)</li>
+<li>Assumes some familiarity with server infra (for the ops people at the back&#x2026;)</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+This is adapted from my old <a href="https://zakame.github.io/docker-eb-demo/README.html">Docker on AWS</a> talk, for DSCL DevDay,
+updated so it focuses more on Docker Engine and Docker Compose.
+</p>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-org96862e6">
+<h2 id="org96862e6">Why Docker?</h2>
+<ul>
+<li>Distribution</li>
+<li>Maintenance</li>
+<li>Development</li>
+
+</ul>
+
+</section>
+<section id="slide-orga365cca">
+<h3 id="orga365cca">The Problem</h3>
+<p>
+"How can I share my work with others while making it easy for them to
+change it?"
+</p>
+
+</section>
+<section id="slide-orgda5151d">
+<h4 id="orgda5151d">Distribution</h4>
+<ul>
+<li>Software systems as containers</li>
+<li>(Mostly) standalone systems (especially for exotic setups)</li>
+<li>(Mostly) less chance of incompatibilities/inconsistencies</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+Thinking of containers as "boxes" does wonders here, because it lets
+your treat the system as something you can "hold" (that is, know what
+is inside the box, as well as what's outside) and something that you
+can "move/share" (as boxes tend to be.)
+</p>
+
+</aside>
+
+</section>
+<section id="slide-orgdce5fa6">
+<h4 id="orgdce5fa6">Maintenance</h4>
+<ul>
+<li>Growing from "pet to cattle" setups</li>
+<li>Reducing moving targets (e.g. external dependencies and/or hybrid
+OS requirements)</li>
+<li>Redundancy (e.g. blue-green deployments)</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+Sysadmins especially love stability, and having a concept of "stuff
+inside a box" strengthens the idea of containers being (near)
+immutable systems.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-org0e9e0a7">
+<h4 id="org0e9e0a7">Development</h4>
+<ul>
+<li>Builds up on distribution and maintenance merits</li>
+<li>Correlate code history with system history (e.g. git vs docker commits)</li>
+<li>Leverage other solutions (e.g. configuration
+management/deployment/orchestration tools)</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+Developers love to tinker, and knowing that they can treat both boxes
+and the stuff inside them as parts they can know and change, while
+building up on the fact that they can share those boxes and maintain
+them, gives an empowering feeling.
+</p>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-orgaa9594f">
+<h2 id="orgaa9594f">Containers</h2>
+<p>
+Operating-system-level virtualization
+</p>
+
+
+<div class="figure">
+<p><img src="https://res.cloudinary.com/startup-grind/image/upload/c_fill,f_auto,g_center,h_350,q_auto:good,w_350/v1/softlayer0/80135C1/media/v1/AUTH_d0619b05-07fc-49f0-8249-da585ea45ce5/docker/events/community_JJgCnE6.png" alt="community_JJgCnE6.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-org6d24c01">
+<h3 id="org6d24c01">Containers vs Virtual Machines</h3>
+<ul>
+<li>Operating-system-level vs hardware-abstraction-level</li>
+<li>Containers can run under VMs (and often do,) but not usually the
+other way around</li>
+<li>Containers depend on OS features (Linux)</li>
+
+</ul>
+
+</section>
+<section id="slide-org0bdb137">
+<h3 id="org0bdb137">Other Container implementations/tools</h3>
+<ul>
+<li>Linux Containers (LXC)</li>
+<li>plain Unix chroot</li>
+<li>FreeBSD jails</li>
+<li>Solaris Zones</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orge3b9b4d">
+<h2 id="orge3b9b4d">Docker Plaform</h2>
+
+<div class="figure">
+<p><img src="https://image.slidesharecdn.com/dockercon-eu-2017-recap-171025193523/95/dockercon-eu-2017-recap-24-638.jpg" alt="dockercon-eu-2017-recap-24-638.jpg" />
+</p>
+</div>
+
+</section>
+<section id="slide-orgd777a50">
+<h3 id="orgd777a50">Docker Engine</h3>
+<ul>
+<li>The "heart" of the Docker ecosystem</li>
+<li>Used to be just a big front-end for the Linux containers</li>
+<li>Now uses libcontainer to front-end for implementations</li>
+
+</ul>
+
+</section>
+<section id="slide-org7ea709f">
+<h4 id="org7ea709f">Demo: A simple CLI app container</h4>
+
+</section>
+<section id="slide-orgfa49fca">
+<h3 id="orgfa49fca">Docker Compose</h3>
+<ul>
+<li>Arrange <b>containers</b> into <b>services</b></li>
+<li>Express software systems in terms of <b>services</b>, <b>networks</b>, and
+<b>volumes</b></li>
+<li>Adapt systems to different environments (dev vs prod) via
+<b>composition</b> of configuration</li>
+
+</ul>
+
+</section>
+<section id="slide-org5c0a726">
+<h4 id="org5c0a726">Demo: A webapp with several services</h4>
+
+</section>
+</section>
+<section>
+<section id="slide-org2c9e79a">
+<h2 id="org2c9e79a">More Information</h2>
+<ul>
+<li><a href="https://www.slideshare.net/Docker/docker-for-devs-john-zaccone-ibm">Docker for Devs by John Zacchone, IBM</a></li>
+<li><a href="https://www.slideshare.net/Docker/docker-for-ops-scott-coulton-puppet">Docker for Ops by Scott Coulton, Puppet</a></li>
+<li><a href="https://www.slideshare.net/chanezon/dockercon-eu-2017-recap">DockerCon EU 2017 Recap</a></li>
+<li><a href="http://training.play-with-docker.com/">Play With Docker Classroom</a></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-org8ed7ac3">
+<h2 id="org8ed7ac3">Finis</h2>
+</section>
+</section>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="https://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'https://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+h1.title {
+    font-size: 2.77em;
+}
+h2.author, h2.email {
+    font-size: 1.5em;
+}
+p.date {
+    font-size: 60%;
+}
+/* .reveal a { */
+/*     font-size: 80%; */
+/* } */
